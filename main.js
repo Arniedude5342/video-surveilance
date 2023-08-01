@@ -1,74 +1,54 @@
-img = "";
+video = "";
 status = "";
 objects = [];
 
-
-function preload() {
-     sound = loadSound('loud_alarm.mp3');
-}
-
 function setup() {
-    canvas = createCanvas(380, 380);
+    canvas = createCanvas(480, 380);
     canvas.center();
-    video = createCapture(VIDEO);
-    video.size(380, 380);
     video.hide();
 }
-function start() {
-    objectDetector = ml5.objectDetector('cocossd', modelLoaded);
-    document.getElementById("status").innerHTML = "Status : Detecting Objects";
-}
 
-function draw() {
-    image(video, 0, 0, 360, 360);
-    if(status != "") {
-        r = random(255);
-        g = random(255);
-        b = random(255);
-        
-        objectDetector.detect(video, gotResults);
-        for(var i = 0; i < objects.length; i++) {
-            document.getElementById("status").innerHTML = "Status : Object Detected";
-            document.getElementById("number_of_objects").innerHTML = "Number of objects detected are : "+ objects.length;
-            fill(r, g ,b);
-            percent = floor(objects[i].confidence*100);
-            text(objects[i].label + " "+percent+"%", objects[i].x+15, objects[i].y+15);
-            noFill();
-            stroke(r, g, b);
-            rect(objects[i].x, objects[i].y, objects[i].width ,objects[i].height);
-        }
-    }
-
-    if(objects[i].label == "person")
-    {
-        document.getElementById("status").innerHTML = "Person Found";
-        console.log("stop");
-        song.stop();
-    }
-    else {
-        document.getElementById("status").innerHTML = "Person Not Found";
-        console.log("play");
-        song.play();
-    }
-
-    if(objects.length == 0)
-    {
-        document.getElementById("status").innerHTML = "Person Not Found";
-        console.log("play");
-        song.play();
-    }
-}
-function modelLoaded() {
-    console.log("Model Loaded");
-    status = true;
+function preload() {
+    video = createVideo('video.mp4');
     
 }
 
-function gotResults(error, results) {
-    if(error) {
+function draw() {
+    image(video, 0, 0, 480, 380);
+    if(status != "")
+    {
+        objectDetector.detect(video, gotResult);
+        for(var i = 0; i < objects.length; i++) {
+            document.getElementById("status").innerHTML = "Status : Object Detected";
+            document.getElementById("number_of_objects").innerHTML = "Number of objects detected are : "+ objects.length;
+            fill('#FF0000');
+            percent = floor(objects[i].confidence*100);
+            text(objects[i].label + " "+percent+"%", objects[i].x+15, objects[i].y+15);
+            noFill();
+            stroke('#FF0000');
+            rect(objects[i].x, objects[i].y, objects[i].width ,objects[i].height);
+        }
+
+    }
+}
+
+function start() {
+    objectDetector = ml5.objectDetector('cocossd', modelLoaded);
+    document.getElementById("status").innerHTML = "Status : Detectong Objects";
+}
+
+function modelLoaded() {
+    console.log("Model Loaded");
+    status = true;
+    video.loop();
+    video.speed(1);
+    video.volume(0);
+}
+
+function gotResult(error, results) {
+    if (error) {
         console.log(error);
     }
     console.log(results);
     objects = results;
-    
 }
